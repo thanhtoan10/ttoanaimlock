@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f23, #1a1a2e, #16213e);
+            min-height: 100vh;
+            color: #ffffff;
+            overflow: hidden;
+        }
+        
+        .mod-menu {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 320px;
+            background: rgba(20, 20, 35, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            z-index: 10000;
+            animation: slideIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            transition: all 0.3s ease;
+            cursor: move;
+        }
+        
+        .mod-menu.hidden {
+            transform: translateX(100%) scale(0.8);
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .mod-menu.minimized {
+            height: 60px;
+            overflow: hidden;
+        }
+        
+        .mod-menu.minimized .menu-content {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        
+        @keyframes slideIn {
+            0% {
+                transform: translateX(100%) scale(0.8);
+                opacity: 0;
+            }
+            100% {
+                transform: translateX(0) scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .menu-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border-radius: 16px 16px 0 0;
+            cursor: move;
+        }
+        
+        .menu-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .menu-icon {
+            color: rgba(255, 255, 255, 0.9);
+            animation: rotate 4s linear infinite;
+        }
+        
+        @keyframes rotate {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        
+        .menu-controls {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .control-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 6px;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+        
+        .menu-content {
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .stream-indicator {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 12px;
+            font-weight: 500;
+            animation: pulse 2s infinite;
+        }
+        
+        .stream-indicator.active {
+            display: flex;
+        }
+        
+        @keyframes pulse {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+        
+        .indicator-dot {
+            width: 8px;
+            height: 8px;
+            background: #ffffff;
+            border-radius: 50%;
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%,
+            50% {
+                opacity: 1;
+            }
+            51%,
+            100% {
+                opacity: 0.3;
+            }
+        }
+        
+        .mod-section {
+            margin-bottom: 20px;
+        }
+        
+        .mod-section h3 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: rgba(255, 255, 255, 0.9);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .mod-item {
+            margin-bottom: 8px;
+            animation: fadeInUp 0.3s ease forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        
+        .mod-item:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+        
+        .mod-item:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+        
+        .mod-item:nth-child(4) {
+            animation-delay: 0.3s;
+        }
+        
+        .mod-item:nth-child(5) {
+            animation-delay: 0.4s;
+        }
+        
+        .mod-item:nth-child(6) {
+            animation-delay: 0.5s;
+        }
+        
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .mod-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+        
+        .mod-label:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-1px);
+        }
+        
+        .mod-name {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        
+        .mod-icon {
+            color: rgba(255, 255, 255, 0.7);
+            transition: all 0.2s ease;
+        }
+        
+        .mod-label:hover .mod-icon {
+            color: #6366f1;
+            transform: scale(1.1);
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+        }
+        
+        .toggle-input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 24px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 2px;
+            bottom: 2px;
+            background: #ffffff;
+            border-radius: 50%;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .toggle-input:checked+.toggle-slider {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border-color: #6366f1;
+            box-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
+        }
+        
+        .toggle-input:checked+.toggle-slider:before {
+            transform: translateX(20px);
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+        }
+        
+        .menu-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 12px;
+        }
+        
+        .status-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .status-text {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .pulse-dot {
+            width: 6px;
+            height: 6px;
+            background: #10b981;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        .version-info {
+            color: rgba(255, 255, 255, 0.5);
+            font-family: 'Courier New', monospace;
+        }
+        
+        .menu-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10001;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .menu-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .menu-toggle.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.8);
+        }
+        
+        .drag-handle {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            cursor: move;
+            z-index: 1;
+        }
+        
+        @media (max-width: 768px) {
+            .mod-menu {
+                width: 280px;
+                top: 10px;
+                right: 10px;
+            }
+            .menu-content {
+                padding: 16px;
+            }
+            .mod-label {
+                padding: 10px 12px;
+            }
+            .mod-name {
+                font-size: 12px;
+            }
+        }
+        
+        .mod-menu.stream-hidden {
+            opacity: 0;
+            transform: translateX(100%) scale(0.9);
+            transition: all 0.5s ease;
+            pointer-events: none;
+        }
+        
+        .mod-menu::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+            border-radius: 16px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        
+        .mod-menu:hover::before {
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="modMenu" class="mod-menu">
+        <div class="menu-header">
+            <div class="menu-title">
+                <svg class="menu-icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                    <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                    <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                </svg>
+                <span>Nguyễn Thanh Toàn</span>
+            </div>
+            <div class="menu-controls">
+                <button id="minimizeBtn" class="control-btn" title="Minimize">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                        <path d="M6 12L18 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </button>
+                <button id="closeBtn" class="control-btn" title="Close">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                        <path d="M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="menu-content">
+            <div class="stream-indicator" id="streamIndicator">
+                <div class="indicator-dot"></div>
+                <span>Stream Mode Active</span>
+            </div>
+
+            <div class="mod-section">
+                <h3>Function </h3>
+                <div class="mod-item">
+                    <label class="mod-label">
+                        <span class="mod-name">
+                            <svg class="mod-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                            </svg>
+                            Tăng Nhạy
+                        </span>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="speedBoost" class="toggle-input">
+                            <span class="toggle-slider"></span>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="mod-item">
+                    <label class="mod-label">
+                        <span class="mod-name">
+                            <svg class="mod-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                                <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                            </svg>
+                          Ghim đầu 
+                        </span>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="noClip" class="toggle-input">
+                            <span class="toggle-slider"></span>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="mod-item">
+                    <label class="mod-label">
+                        <span class="mod-name">
+                            <svg class="mod-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            Nhẹ Tâm
+                        </span>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="infiniteHealth" class="toggle-input">
+                            <span class="toggle-slider"></span>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="mod-item">
+                    <label class="mod-label">
+                        <span class="mod-name">
+                            <svg class="mod-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                <path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                            Auto Aim
+                        </span>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="autoAim" class="toggle-input">
+                            <span class="toggle-slider"></span>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="mod-item">
+                    <label class="mod-label">
+                        <span class="mod-name">
+                            <svg class="mod-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                <path d="M1 12S5 4 12 4S23 12 23 12S19 20 12 20S1 12 1 12Z" stroke="currentColor" stroke-width="2"/>
+                                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                            X-Ray Vision
+                        </span>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="xrayVision" class="toggle-input">
+                            <span class="toggle-slider"></span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <div class="mod-section">
+                <h3>Stream Settings</h3>
+                <div class="mod-item">
+                    <label class="mod-label">
+                        <span class="mod-name">
+                            <svg class="mod-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                <rect x="2" y="3" width="20" height="14" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
+                                <line x1="8" y1="21" x2="16" y2="21" stroke="currentColor" stroke-width="2"/>
+                                <line x1="12" y1="17" x2="12" y2="21" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                            Stream Mode
+                        </span>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="streamMode" class="toggle-input">
+                            <span class="toggle-slider"></span>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="mod-item">
+                    <label class="mod-label">
+                        <span class="mod-name">
+                            <svg class="mod-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                <path d="M9 9H15V15H9V9Z" stroke="currentColor" stroke-width="2"/>
+                                <path d="M2 9H22V15H2V9Z" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                            Auto Hide
+                        </span>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="autoHide" class="toggle-input" checked>
+                            <span class="toggle-slider"></span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <div class="menu-footer">
+                <div class="status-info">
+                    <span class="status-text" id="statusText">Ready</span>
+                    <div class="pulse-dot"></div>
+                </div>
+                <div class="version-info">v1.0.0</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="menuToggle" class="menu-toggle hidden">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M3 12H21M3 6H21M3 18H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+    </div>
+
+    <div id="dragHandle" class="drag-handle"></div>
+
+    <script>
+        class ModMenu {
+            constructor() {
+                this.menu = document.getElementById('modMenu');
+                this.toggleBtn = document.getElementById('menuToggle');
+                this.minimizeBtn = document.getElementById('minimizeBtn');
+                this.closeBtn = document.getElementById('closeBtn');
+                this.streamIndicator = document.getElementById('streamIndicator');
+                this.statusText = document.getElementById('statusText');
+
+                this.isMinimized = false;
+                this.isDragging = false;
+                this.isStreamMode = false;
+                this.isRecording = false;
+                this.dragOffset = {
+                    x: 0,
+                    y: 0
+                };
+
+                this.modStates = {};
+                this.checkInterval = null;
+
+                this.init();
+            }
+
+            init() {
+                this.loadSettings();
+                this.bindEvents();
+                this.startStreamDetection();
+                this.updateStatus('Initialized');
+                setTimeout(() => {
+                    document.querySelectorAll('.mod-item').forEach((item, index) => {
+                        item.style.animationDelay = `${index * 0.1}s`;
+                    });
+                }, 100);
+            }
+
+            bindEvents() {
+                this.minimizeBtn.addEventListener('click', () => this.toggleMinimize());
+                this.closeBtn.addEventListener('click', () => this.hideMenu());
+                this.toggleBtn.addEventListener('click', () => this.showMenu());
+                this.menu.addEventListener('mousedown', (e) => this.startDrag(e));
+                document.addEventListener('mousemove', (e) => this.drag(e));
+                document.addEventListener('mouseup', () => this.stopDrag());
+                this.menu.addEventListener('touchstart', (e) => this.startDrag(e.touches[0]));
+                document.addEventListener('touchmove', (e) => {
+                    if (this.isDragging) {
+                        e.preventDefault();
+                        this.drag(e.touches[0]);
+                    }
+                });
+                document.addEventListener('touchend', () => this.stopDrag());
+                document.querySelectorAll('.toggle-input').forEach(toggle => {
+                    toggle.addEventListener('change', (e) => this.handleToggle(e));
+                });
+
+                document.addEventListener('keydown', (e) => this.handleKeyboard(e));
+                const streamModeToggle = document.getElementById('streamMode');
+                streamModeToggle.addEventListener('change', (e) => {
+                    this.isStreamMode = e.target.checked;
+                    this.updateStreamMode();
+                });
+
+                const autoHideToggle = document.getElementById('autoHide');
+                autoHideToggle.addEventListener('change', (e) => {
+                    this.saveSettings();
+                });
+            }
+
+            startDrag(e) {
+                this.isDragging = true;
+                const rect = this.menu.getBoundingClientRect();
+                this.dragOffset.x = e.clientX - rect.left;
+                this.dragOffset.y = e.clientY - rect.top;
+                this.menu.style.cursor = 'grabbing';
+                this.menu.style.zIndex = '10002';
+            }
+
+            drag(e) {
+                if (!this.isDragging) return;
+
+                const x = e.clientX - this.dragOffset.x;
+                const y = e.clientY - this.dragOffset.y;
+
+                const maxX = window.innerWidth - this.menu.offsetWidth;
+                const maxY = window.innerHeight - this.menu.offsetHeight;
+
+                const constrainedX = Math.max(0, Math.min(x, maxX));
+                const constrainedY = Math.max(0, Math.min(y, maxY));
+
+                this.menu.style.left = `${constrainedX}px`;
+                this.menu.style.top = `${constrainedY}px`;
+                this.menu.style.right = 'auto';
+            }
+
+            stopDrag() {
+                if (this.isDragging) {
+                    this.isDragging = false;
+                    this.menu.style.cursor = 'move';
+                    this.menu.style.zIndex = '10000';
+                    this.savePosition();
+                }
+            }
+
+            toggleMinimize() {
+                this.isMinimized = !this.isMinimized;
+                this.menu.classList.toggle('minimized', this.isMinimized);
+
+                if (this.isMinimized) {
+                    this.updateStatus('Minimized');
+                } else {
+                    this.updateStatus('Expanded');
+                }
+
+                this.saveSettings();
+            }
+
+            hideMenu() {
+                this.menu.classList.add('hidden');
+                this.toggleBtn.classList.remove('hidden');
+                this.updateStatus('Hidden');
+            }
+
+            showMenu() {
+                this.menu.classList.remove('hidden');
+                this.toggleBtn.classList.add('hidden');
+                this.updateStatus('Visible');
+            }
+
+            handleToggle(e) {
+                const toggleId = e.target.id;
+                const isEnabled = e.target.checked;
+
+                this.modStates[toggleId] = isEnabled;
+                this.saveSettings();
+                const modItem = e.target.closest('.mod-item');
+                if (isEnabled) {
+                    modItem.style.background = 'rgba(99, 102, 241, 0.1)';
+                    modItem.style.borderColor = 'rgba(99, 102, 241, 0.3)';
+                } else {
+                    modItem.style.background = '';
+                    modItem.style.borderColor = '';
+                }
+
+                this.simulateModFunction(toggleId, isEnabled);
+
+                this.updateStatus(`${toggleId}: ${isEnabled ? 'ON' : 'OFF'}`);
+            }
+
+            simulateModFunction(modId, enabled) {
+                const modNames = {
+                    speedBoost: 'Speed Boost',
+                    noClip: 'No Clip',
+                    infiniteHealth: 'Infinite Health',
+                    autoAim: 'Auto Aim',
+                    xrayVision: 'X-Ray Vision',
+                    streamMode: 'Stream Mode',
+                    autoHide: 'Auto Hide'
+                };
+
+                const modName = modNames[modId] || modId;
+                console.log(`${modName} ${enabled ? 'enabled' : 'disabled'}`);
+
+                this.createParticleEffect();
+            }
+
+            createParticleEffect() {
+                const particle = document.createElement('div');
+                particle.style.cssText = `
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #6366f1;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10003;
+            animation: particle 0.6s ease-out forwards;
+        `;
+
+                const rect = this.menu.getBoundingClientRect();
+                particle.style.left = `${rect.left + rect.width / 2}px`;
+                particle.style.top = `${rect.top + rect.height / 2}px`;
+
+                document.body.appendChild(particle);
+                const style = document.createElement('style');
+                style.textContent = `
+            @keyframes particle {
+                0% {
+                    transform: scale(1) translateY(0);
+                    opacity: 1;
+                }
+                100% {
+                    transform: scale(0) translateY(-50px);
+                    opacity: 0;
+                }
+            }
+        `;
+                document.head.appendChild(style);
+
+                setTimeout(() => {
+                    document.body.removeChild(particle);
+                    document.head.removeChild(style);
+                }, 600);
+            }
+
+            async startStreamDetection() {
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
+                    console.warn('Screen Capture API not supported');
+                    return;
+                }
+
+                this.checkInterval = setInterval(() => {
+                    this.checkStreamingStatus();
+                }, 1000);
+            }
+
+            async checkStreamingStatus() {
+                try {
+                    const isRecording = await this.detectScreenRecording();
+
+                    if (isRecording !== this.isRecording) {
+                        this.isRecording = isRecording;
+                        this.handleStreamingChange();
+                    }
+                } catch (error) {}
+            }
+
+            async detectScreenRecording() {
+                try {
+                    const hasActiveMediaRecorder = window.MediaRecorder &&
+                        document.querySelector('video[autoplay]') !== null;
+
+                    const hasActiveStream = navigator.mediaDevices &&
+                        document.visibilityState === 'visible' &&
+                        performance.now() % 10000 < 100;
+
+                    return hasActiveMediaRecorder || hasActiveStream;
+                } catch (error) {
+                    return false;
+                }
+            }
+
+            handleStreamingChange() {
+                const autoHideEnabled = document.getElementById('autoHide').checked;
+
+                if (this.isRecording && this.isStreamMode && autoHideEnabled) {
+                    this.menu.classList.add('stream-hidden');
+                    this.streamIndicator.classList.add('active');
+                    this.updateStatus('Stream detected - Hidden');
+                } else {
+                    this.menu.classList.remove('stream-hidden');
+                    this.streamIndicator.classList.remove('active');
+                    this.updateStatus('Stream ended - Visible');
+                }
+            }
+
+            updateStreamMode() {
+                if (this.isStreamMode) {
+                    this.updateStatus('Stream mode enabled');
+                } else {
+                    this.menu.classList.remove('stream-hidden');
+                    this.streamIndicator.classList.remove('active');
+                    this.updateStatus('Stream mode disabled');
+                }
+            }
+
+            handleKeyboard(e) {
+                if (e.ctrlKey && e.shiftKey) {
+                    switch (e.key) {
+                        case 'M':
+                            e.preventDefault();
+                            if (this.menu.classList.contains('hidden')) {
+                                this.showMenu();
+                            } else {
+                                this.hideMenu();
+                            }
+                            break;
+                        case 'T':
+                            e.preventDefault();
+                            this.toggleMinimize();
+                            break;
+                        case 'S':
+                            e.preventDefault();
+                            const streamToggle = document.getElementById('streamMode');
+                            streamToggle.checked = !streamToggle.checked;
+                            streamToggle.dispatchEvent(new Event('change'));
+                            break;
+                    }
+                }
+            }
+
+            updateStatus(message) {
+                this.statusText.textContent = message;
+                setTimeout(() => {
+                    if (this.statusText.textContent === message) {
+                        this.statusText.textContent = 'Ready';
+                    }
+                }, 3000);
+            }
+
+            savePosition() {
+                const rect = this.menu.getBoundingClientRect();
+                localStorage.setItem('modMenuPosition', JSON.stringify({
+                    x: rect.left,
+                    y: rect.top
+                }));
+            }
+
+            saveSettings() {
+                const settings = {
+                    modStates: this.modStates,
+                    isMinimized: this.isMinimized,
+                    isStreamMode: this.isStreamMode,
+                    autoHide: document.getElementById('autoHide').checked
+                };
+
+                localStorage.setItem('modMenuSettings', JSON.stringify(settings));
+            }
+
+            loadSettings() {
+                try {
+                    const position = JSON.parse(localStorage.getItem('modMenuPosition') || '{}');
+                    if (position.x !== undefined && position.y !== undefined) {
+                        this.menu.style.left = `${position.x}px`;
+                        this.menu.style.top = `${position.y}px`;
+                        this.menu.style.right = 'auto';
+                    }
+                    const settings = JSON.parse(localStorage.getItem('modMenuSettings') || '{}');
+
+                    this.modStates = settings.modStates || {};
+                    this.isMinimized = settings.isMinimized || false;
+                    this.isStreamMode = settings.isStreamMode || false;
+                    Object.keys(this.modStates).forEach(toggleId => {
+                        const toggle = document.getElementById(toggleId);
+                        if (toggle) {
+                            toggle.checked = this.modStates[toggleId];
+                            if (this.modStates[toggleId]) {
+                                const modItem = toggle.closest('.mod-item');
+                                modItem.style.background = 'rgba(99, 102, 241, 0.1)';
+                                modItem.style.borderColor = 'rgba(99, 102, 241, 0.3)';
+                            }
+                        }
+                    });
+
+                    if (this.isMinimized) {
+                        this.menu.classList.add('minimized');
+                    }
+
+                    const streamToggle = document.getElementById('streamMode');
+                    streamToggle.checked = this.isStreamMode;
+
+                    if (settings.autoHide !== undefined) {
+                        document.getElementById('autoHide').checked = settings.autoHide;
+                    }
+
+                } catch (error) {
+                    console.warn('Failed to load settings:', error);
+                }
+            }
+
+            destroy() {
+                if (this.checkInterval) {
+                    clearInterval(this.checkInterval);
+                }
+            }
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            const modMenu = new ModMenu();
+            window.modMenu = modMenu;
+            window.addEventListener('beforeunload', () => {
+                modMenu.destroy();
+            });
+
+            window.addEventListener('resize', () => {
+                const rect = modMenu.menu.getBoundingClientRect();
+                const maxX = window.innerWidth - modMenu.menu.offsetWidth;
+                const maxY = window.innerHeight - modMenu.menu.offsetHeight;
+
+                if (rect.left > maxX || rect.top > maxY) {
+                    modMenu.menu.style.left = `${Math.min(rect.left, maxX)}px`;
+                    modMenu.menu.style.top = `${Math.min(rect.top, maxY)}px`;
+                    modMenu.savePosition();
+                }
+            });
+        });
+
+        window.addEventListener('load', () => {
+            setInterval(() => {
+                document.querySelectorAll('.toggle-input:checked + .toggle-slider').forEach(slider => {
+                    slider.style.boxShadow = `0 0 ${10 + Math.sin(Date.now() / 1000) * 5}px rgba(99, 102, 241, 0.4)`;
+                });
+            }, 50);
+            setInterval(() => {
+                if (Math.random() < 0.1) {
+                    createSparkle();
+                }
+            }, 2000);
+        });
+
+        function createSparkle() {
+            const sparkle = document.createElement('div');
+            sparkle.innerHTML = '✨';
+            sparkle.style.cssText = `
+        position: fixed;
+        font-size: 12px;
+        pointer-events: none;
+        z-index: 10004;
+        animation: sparkle 2s ease-out forwards;
+    `;
+
+            const menu = document.getElementById('modMenu');
+            const rect = menu.getBoundingClientRect();
+
+            sparkle.style.left = `${rect.left + Math.random() * rect.width}px`;
+            sparkle.style.top = `${rect.top + Math.random() * rect.height}px`;
+
+            document.body.appendChild(sparkle);
+
+            const style = document.createElement('style');
+            style.textContent = `
+        @keyframes sparkle {
+            0% {
+                transform: scale(0) rotate(0deg);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1) rotate(180deg);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(0) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    `;
+            document.head.appendChild(style);
+
+            setTimeout(() => {
+                if (document.body.contains(sparkle)) {
+                    document.body.removeChild(sparkle);
+                }
+                if (document.head.contains(style)) {
+                    document.head.removeChild(style);
+                }
+            }, 2000);
+        }
+    </script>
+</body>
+
+</html>
